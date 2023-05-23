@@ -1,0 +1,11 @@
+# TOKEN
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: disckup-config
+  namespace: bots
+data:
+  CLIENT_TOKEN: '<bot-token>'
+  CLIENT_ID: '<bot-id>'
+  GUILD_ID: '<discord-server-id>'
+  CLICKUP_API_URL: '<comment-post-api-on-clickup>'

@@ -1,0 +1,56 @@
+image: docker:stable
+
+variables:
+  CACHE_KEY: ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+
+stages:
+  - publish
+  - deploy
+
+.only_tagged_or_release: &only_tagged_or_release
+  only:
+    - tags
+    - /^v\d+\.\d+\.\d+(-rc(\d)+)?$/
+
+.publish: &publish
+  <<: *only_tagged_or_release
+  stage: publish
+  services:
+    - docker:dind
+  retry: 2
+  before_script:
+    - docker info
+    - export VERSION=$(echo $CI_COMMIT_TAG | cut -d 'v' -f 2)
+  cache:
+    key: ${CACHE_KEY}
+  tags:
+    - docker
+
+publish_portal_azure:
+  <<: *publish
+  script:
+  - echo $SENSEUP_DEV_INT_REGISTRY_TOKEN | docker login -u $SENSEUP_DEV_INT_REGISTRY_USER --password-stdin $SENSEUP_DEV_INT_REGISTRY_HOST
+  - docker build -t ${SENSEUP_DEV_INT_REGISTRY_HOST}/bots/disckup:${VERSION} .
+  - docker push ${SENSEUP_DEV_INT_REGISTRY_HOST}/bots/disckup:${VERSION}
+
+.deploy: &deploy
+  <<: *only_tagged_or_release
+  image:
+    name: dtzar/helm-kubectl
+  stage: deploy
+  before_script:
+    - apk add git
+    - export TAG=$(echo $CI_COMMIT_TAG | cut -d 'v' -f 2)
+
+deploy_portal_azure:
+  <<: *deploy
+  dependencies:
+    - publish_portal_azure
+  script:
+    - kubectl config set-cluster ${SENSEUP_DEV_INT_KUBE_CONTEXT} --server=${SENSEUP_DEV_INT_KUBE_SERVER}
+    - kubectl config set clusters.${SENSEUP_DEV_INT_KUBE_CONTEXT}.certificate-authority-data ${SENSEUP_DEV_INT_KUBE_CERT}
+    - kubectl config set-credentials gitlab --token=${SENSEUP_DEV_INT_KUBE_TOKEN}
+    - kubectl config set-context default --cluster=${SENSEUP_DEV_INT_KUBE_CONTEXT} --user=gitlab
+    - kubectl config use-context default
+    - kubectl set image deployment/disckup -n bots disckup=${SENSEUP_DEV_INT_CONTAINER_REGISTRY}.azurecr.io/bots/disckup:${TAG} --record=true
+
