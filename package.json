@@ -1,0 +1,32 @@
+{
+  "name": "disckup",
+  "version": "2.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --no-warnings src/deploy-commands.js && node --no-warnings src/index.js",
+    "build": "node src/deploy-commands.js",
+    "dev": "node --no-warnings src/deploy-commands.js && nodemon --no-warnings src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com:multicast/senseup/disckup.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/multicast/senseup/disckup/issues"
+  },
+  "homepage": "https://gitlab.com/multicast/senseup/disckup#readme",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^8.30.0"
+  }
+}

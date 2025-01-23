@@ -1,0 +1,14 @@
+# TOKEN
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: disckup-config
+  namespace: bots
+data:
+  DISCKUP_API_URL: '<comment-post-api-on-clickup>'
+  DISCKUP_CLIENT_TOKEN: '<bot-token>'
+  DISCKUP_CLIENT_ID: '<bot-id>'
+  DISCKUP_GUILD_ID: '<discord-server-id>'
+  DISCKUP_POST_MESSAGE_TRIGGER_PREFIX: '<post-message-trigger-prefix>'
+  DISCKUP_SQLITE_DATABASE: '<sqlite-database-name>'
+  DISCKUP_SQLITE_THREAD_TABLE_NAME: '<sqlite-table-name>'
